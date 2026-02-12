@@ -1,0 +1,125 @@
+:root {
+    --alert-red: #b00000;
+    --alert-dark: #7a0000;
+    --bg-dark: #111;
+    --text-light: #ffffff;
+    --text-muted: #f2caca;
+}
+
+.hidden {
+    display: none !important;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ALERT HEADER */
+.alert {
+    background: linear-gradient(90deg, var(--alert-dark), var(--alert-red));
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    width: 100vw;
+}
+
+.alert-icon {
+    font-size: 4rem;
+    animation: pulse 1.8s infinite;
+}
+
+.alert-text h1 {
+    font-size: 2.2rem;
+    letter-spacing: 0.08em;
+}
+
+.location {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.instruction {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+/* MAP AREA */
+.content {
+    flex: 1;
+    padding: 1rem;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    background-color: #222;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+/* FOOTER */
+.footer {
+    background-color: #1a1a1a;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    border-top: 2px solid var(--alert-red);
+}
+
+/* ANIMATION */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+/*body {*/
+/*    color: white;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*}*/
+
+/*.header {*/
+/*    background-color: #A20000;*/
+/*    height: 18vh;*/
+/*    width: 100vw;*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    flex-direction: row;*/
+/*    flex-grow: 0;*/
+/*}*/
+
+/*.header span {*/
+/*    font-size: 6rem;*/
+/*}*/
+
+/*.header div:first-child {*/
+/*    font-size: 2rem;*/
+/*    font-weight: bold;*/
+/*}*/
+
+/*#map {*/
+/*    width: 100vw;*/
+/*    height: 38rem;*/
+/*    flex-grow: 1;*/
+/*}*/
+
+/*.footer {*/
+/*    height: 3vh;*/
+/*    width: 100vw;*/
+/*    background-color: #A20000;*/
+/*    flex-grow: 0;*/
+/*}*/

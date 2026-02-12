@@ -1,0 +1,406 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>SUMO Real-time Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        
+        /* ΑΠΑΡΑΙΤΗΤΟ: Φέρνει το κουμπί πάνω από τον χάρτη */
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            z-index: 1000; /* Πολύ υψηλό νούμερο για να είναι "πάνω" από όλα */
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 4px;
+            background: red;
+            margin-right: 10px;
+            border-top: 2px dashed white; /* Δημιουργεί εφέ διακεκομμένης */
+            border-bottom: 2px dashed white;
+        }
+
+        .legend-icon {
+            width: 30px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        
+        /* ΑΠΑΡΑΙΤΗΤΟ: Καθαρίζει τα εικονίδια FontAwesome από το λευκό πλαίσιο του Leaflet */
+        .custom-div-icon {
+            background: none !important;
+            border: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" style="height: 100vh;"></div>
+    <div id="controls">
+    <button id="start-btn" onclick="startSimulation()" style="padding: 10px 20px; font-weight: bold; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; width: 100%;">
+        <i class="fa-solid fa-play"></i> SIMULATE
+    </button>
+
+    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
+    <div class="legend-item">
+        <div class="legend-line"></div>
+        <span>Κλειστός Δρόμος</span>
+    </div>
+
+    <div class="legend-item">
+        <div class="legend-icon">
+            <i class="fas fa-parking" style="color: #e67e22; font-size: 18px;"></i>
+        </div>
+        <span>Occupied Spot</span>
+    </div>
+    <button id="start-btn" onclick="startSimulation()" style="padding: 10px 20px; font-weight: bold; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px;">
+        <i class="fa-solid fa-play"></i> SIMULATE
+    </button>
+    </div>
+    <script>
+        var socket = io();
+
+        var blockedLines = [];
+        var parkingMarkers = [];
+        var map = L.map('map').setView([38.28888, 21.786546], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        var markers = {}; // Αποθήκευση markers για να μην τους ξαναφτιάχνουμε
+        var carIcon = L.divIcon({
+                html: '<i class="fa-solid fa-car" style="color: #2980b9; font-size: 20px;"></i>',
+                className: 'custom-div-icon', // Αφαιρεί το default λευκό τετράγωνο
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+       var parkingIcon = L.divIcon({
+            html: 
+                '<i class="fas fa-parking" style="color: #e67e22; font-size: 24px; "></i>' ,
+                
+            className: 'custom-div-icon', 
+            iconSize: [30, 30],
+            iconAnchor: [15, 15] // Το κέντρο του εικονιδίου
+});
+
+        var destCoords = [38.290329, 21.784175];
+
+            
+        var exitIcon = L.divIcon({
+                html: '<i class="fa-solid fa-door-open" style="color: #27ae60; font-size: 24px;"></i>',
+                className: 'custom-div-icon',
+                iconSize: [30, 30],
+                iconAnchor: [12, 12]
+            });
+
+        L.marker(destCoords, {icon: exitIcon}).addTo(map).bindPopup("exit");
+
+      
+
+    socket.on('blocked_edges', function(data) {
+            // 1. Καθαρισμός προηγούμενων γραμμών
+            blockedLines.forEach(line => map.removeLayer(line));
+            blockedLines = [];
+
+            // 2. Σχεδίαση νέων γραμμών για κάθε blocked edge
+            data.roads.forEach(coords => {
+                var polyline = L.polyline(coords, {
+                    color: 'red',      // Κόκκινο χρώμα
+                    weight: 8,         // Πάχος γραμμής
+                    opacity: 0.7,      // Διαφάνεια
+                    dashArray: '10, 10' // Διακεκομμένη γραμμή για να φαίνεται "κλειστό"
+                }).addTo(map);
+                
+                blockedLines.push(polyline);
+            });
+    });
+        
+
+    socket.on('update_positions', function(data) {
+        // 1. Δημιουργούμε ένα Set με τα IDs των αυτοκινήτων που είναι ενεργά ΤΩΡΑ
+        var activeVehicleIds = new Set();
+        
+        data.forEach(veh => {
+                activeVehicleIds.add(veh.id); // Προσθήκη του ID στο Set
+
+                if (markers[veh.id]) {
+                    // Ενημέρωση θέσης αν υπάρχει ήδη
+                    markers[veh.id].setLatLng([veh.lat, veh.lon]);
+                } else {
+                    // Δημιουργία νέου marker αν εμφανίστηκε τώρα
+                    markers[veh.id] = L.marker([veh.lat, veh.lon], { icon: carIcon })
+                        .addTo(map)
+                        .bindPopup("Vehicle: " + veh.id);
+                }
+            });
+
+            // 2. ΕΛΕΓΧΟΣ ΔΙΑΓΡΑΦΗΣ: Ψάχνουμε ποια markers έχουμε αποθηκευμένα 
+            // αλλά δεν ήρθαν στα νέα δεδομένα από τον server
+            Object.keys(markers).forEach(id => {
+                if (!activeVehicleIds.has(id)) {
+                    map.removeLayer(markers[id]); // Αφαίρεση από τον χάρτη
+                    delete markers[id];           // Διαγραφή από το αντικείμενο markers
+                    console.log("Vehicle " + id + " reached destination and was removed.");
+                }
+            });
+    });
+
+    socket.on('occupied_parkings', function(data) {
+        console.log("Received coordinates:", data.points); // Debugging
+        
+        // Καθαρισμός παλιών
+        parkingMarkers.forEach(m => map.removeLayer(m));
+        parkingMarkers = [];
+
+        data.points.forEach(coords => {
+            // Αν το tuple είναι (lon, lat), τότε:
+            // coords[0] είναι το Longitude
+            // coords[1] είναι το Latitude
+            var pMarker = L.marker([coords[1], coords[0]],{icon:parkingIcon})
+                .addTo(map)
+                .bindPopup("Occupied Parking Slot: " + coords[1] + ", " + coords[0]);
+            
+            parkingMarkers.push(pMarker);
+        });
+
+        // Προαιρετικό: Αν θες ο χάρτης να εστιάζει αυτόματα στα πάρκινγκ μόλις φορτώσουν
+        if (parkingMarkers.length > 0) {
+            var group = new L.featureGroup(parkingMarkers);
+            map.fitBounds(group.getBounds());
+        }
+    });
+
+
+        function startSimulation() {
+        // Στέλνει το σήμα στον server
+        socket.emit('start_simulation');
+        // Απενεργοποιεί το κουμπί για να μην πατηθεί δύο φορές
+        document.getElementById('start-btn').disabled = true;
+        document.getElementById('start-btn').style.background = '#95a5a6';
+        console.log("Sent start signal to server...");
+    }
+
+    
+    
+    
+    </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SUMO Real-time Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 200px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-top: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 6px;
+            background: red;
+            margin-right: 12px;
+            border-top: 2px dashed white;
+            border-bottom: 2px dashed white;
+        }
+
+        .legend-icon {
+            width: 30px;
+            text-align: center;
+            margin-right: 12px;
+        }
+
+        .custom-div-icon {
+            background: none !important;
+            border: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+    <button id="start-btn" onclick="startSimulation()" style="padding: 12px; font-weight: bold; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; width: 100%;">
+        <i class="fa-solid fa-play"></i> SIMULATE
+    </button>
+
+    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
+    <div class="legend-item">
+        <div class="legend-icon">
+            <i class="fa-solid fa-door-open" style="color: #27ae60; font-size: 18px;"></i>
+        </div>
+        <span>Exit</span>
+    </div>
+
+    <div class="legend-item">
+        <div class="legend-line"></div>
+        <span>closed road</span>
+    </div>
+
+    <div class="legend-item">
+        <div class="legend-icon">
+            <i class="fas fa-parking" style="color: #e67e22; font-size: 18px;"></i>
+        </div>
+        <span>Occupied spot</span>
+    </div>
+
+    <div class="legend-item">
+        <div class="legend-icon">
+            <i class="fa-solid fa-car" style="color: #2980b9; font-size: 18px;"></i>
+        </div>
+        <span>Active vehicle</span>
+    </div>
+</div>
+
+    <div id="map"></div>
+
+    <script>
+        var socket = io();
+        var markers = {}; 
+        var blockedLines = [];
+        var parkingMarkers = [];
+
+        // 1. Αρχικοποίηση Χάρτη
+        var map = L.map('map').setView([38.28888, 21.786546], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // 2. Εικονίδια
+        var carIcon = L.divIcon({
+            html: '<i class="fa-solid fa-car" style="color: #2980b9; font-size: 20px;"></i>',
+            className: 'custom-div-icon',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        var parkingIcon = L.divIcon({
+            html: '<i class="fas fa-parking" style="color: #e67e22; font-size: 24px;"></i>',
+            className: 'custom-div-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        var exitIcon = L.divIcon({
+            html: '<i class="fa-solid fa-door-open" style="color: #27ae60; font-size: 24px;"></i>',
+            className: 'custom-div-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        L.marker([38.290329, 21.784175], {icon: exitIcon}).addTo(map).bindPopup("Exit Destination");
+        map.on('click', function(e) {
+        var lat = e.latlng.lat;
+        var lon = e.latlng.lng;
+
+        // Προσθήκη marker στη θέση της φωτιάς
+        L.circle([lat, lon], {
+        color: 'red',       // χρώμα γραμμής
+        fillColor: '#f03',  // γέμισμα
+        fillOpacity: 0.3,   // διαφάνεια
+        radius: 50      // ακτίνα σε μέτρα
+        }).addTo(map);
+
+        // Στέλνουμε το κέντρο φωτιάς στο backend μέσω socket.io
+        socket.emit('new_fire', {lat: lat, lon: lon});
+        console.log("Fire sent to server:", lat, lon);
+    });
+        // 3. Socket Events
+        socket.on('blocked_edges', function(data) {
+            blockedLines.forEach(line => map.removeLayer(line));
+            blockedLines = [];
+            data.roads.forEach(coords => {
+                var polyline = L.polyline(coords, {
+                    color: 'red', weight: 8, opacity: 0.7, dashArray: '10, 10'
+                }).addTo(map);
+                blockedLines.push(polyline);
+            });
+        });
+
+        socket.on('update_positions', function(data) {
+            var activeVehicleIds = new Set();
+            data.forEach(veh => {
+                activeVehicleIds.add(veh.id);
+                if (markers[veh.id]) {
+                    markers[veh.id].setLatLng([veh.lat, veh.lon]);
+                } else {
+                    markers[veh.id] = L.marker([veh.lat, veh.lon], { icon: carIcon })
+                        .addTo(map)
+                        .bindPopup("Vehicle: " + veh.id);
+                }
+            });
+
+            // Διαγραφή οχημάτων που έφτασαν
+            Object.keys(markers).forEach(id => {
+                if (!activeVehicleIds.has(id)) {
+                    map.removeLayer(markers[id]);
+                    delete markers[id];
+                }
+            });
+        });
+
+        socket.on('occupied_parkings', function(data) {
+            parkingMarkers.forEach(m => map.removeLayer(m));
+            parkingMarkers = [];
+            data.points.forEach(coords => {
+                var pMarker = L.marker([coords[1], coords[0]], {icon: parkingIcon})
+                    .addTo(map)
+                    .bindPopup("Occupied Slot");
+                parkingMarkers.push(pMarker);
+            });
+        });
+
+        function startSimulation() {
+            socket.emit('start_simulation');
+            var btn = document.getElementById('start-btn');
+            btn.disabled = true;
+            btn.style.background = '#95a5a6';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> RUNNING...';
+        }
+    </script>
+</body>
+</html>

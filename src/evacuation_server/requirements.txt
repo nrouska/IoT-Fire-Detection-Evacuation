@@ -1,0 +1,9 @@
+flask
+networkx>=3.1
+osmnx>=1.9.0
+pandas
+geopandas
+rtree
+scipy
+shapely
+scikit-learn

@@ -1,0 +1,13 @@
+.elevated-box {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.elevated-box > span {
+    font-size: 1.2rem;
+    font-weight: bold;
+}

@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+.env
+*.log
+*.zip
+*.tar
+*.mp4
+*.csv
+*.db
+__pycache__/
+.venv/

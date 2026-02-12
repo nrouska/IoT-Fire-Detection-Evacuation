@@ -1,0 +1,23 @@
+{
+  "name": "fire-admin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.4",
+    "express-mysql-session": "^3.0.3",
+    "express-session": "^1.19.0",
+    "mqtt": "^5.15.0",
+    "mysql2": "^3.16.2",
+    "node-fetch": "^3.3.2"
+  }
+}

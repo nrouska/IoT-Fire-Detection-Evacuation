@@ -1,0 +1,73 @@
+<div class="quick-access-header">
+    <div>
+        <div onclick="window.location.href='/devices'">
+            <span class="material-symbols-outlined">device_hub</span>
+            Devices
+        </div>
+        <div onclick="window.location.href='/topology'">
+            <span class="material-symbols-outlined">family_history</span>
+            Topology
+        </div>
+        <div onclick="window.location.href='/simulation'">
+            <span class="material-symbols-outlined">simulation</span>
+            Simulation
+        </div>
+    </div>
+    <div>
+        <div>
+            <span class="material-symbols-outlined">settings</span>
+            Settings
+        </div>
+        <div>
+            <span class="material-symbols-outlined">browse_activity</span>
+            Logs & Diagnostics
+        </div>
+    </div>
+</div>
+
+<div class="dashboard">
+    <div>
+        <div class="elevated-box">
+            <span>Basic Information</span>
+            {{#with basicInfo}}
+                <div>
+                    <span>Device Name</span>
+                    <span>{{[Device Name]}}</span>
+                </div>
+                <div>
+                    <span>Firmware Version</span>
+                    <span>{{[Firmware Version]}}</span>
+                </div>
+                <div>
+                    <span>MAC Address</span>
+                    <span>{{[MAC Address]}}</span>
+                </div>
+                <div>
+                    <span>IP Address</span>
+                    <span>{{[IP Address]}}</span>
+                </div>
+                <div>
+                    <span>Uptime</span>
+                    <span>{{[Uptime]}}</span>
+                </div>
+            {{/with}}
+        </div>
+        <div class="elevated-box">
+            <span>Devices Information</span>
+            {{#with deviceInformation}}
+                <div>
+                    <span>Devices</span>
+                    <span>{{[Devices]}}</span>
+                </div>
+                <div>
+                    <span>Devices pending topology assignment</span>
+                    <span>{{[Devices pending topology assignment]}}</span>
+                </div>
+            {{/with}}
+        </div>
+    </div>
+    <div class="elevated-box">
+        <span style="display: block">System Performance</span>
+        <iframe src="https://stats.fitproject.sveronis.net/public-dashboards/795781b3ef6547ecb456d39550e8ce6e?theme=light"></iframe>
+    </div>
+</div>

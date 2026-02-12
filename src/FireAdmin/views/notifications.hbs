@@ -1,0 +1,37 @@
+<div class="elevated-box">
+    <span>Notification Settings</span>
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Κείμενο</label>
+        <form action="/api/notifications" method="POST">
+            <div style="display: flex; flex-direction: row; align-items: center;">
+                <input type="text" name="message" class="form-control me-2" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <button type="submit" class="btn btn-primary ms-2">Υποβολή</button>
+            </div>
+        </form>
+    </div>
+    <hr>
+    <table style="border: none; width: 100%;">
+        <thead>
+        <tr>
+            <th>Message</th>
+            <th>Start Date</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+            {{#each notifications}}
+                <tr>
+                    <td>{{this.text}}</td>
+                    <td>{{this.start_date}}</td>
+                    <td>
+                        {{#if this.status}}
+                            <span class="badge text-bg-success">Ενεργό</span>
+                        {{else}}
+                            <span class="badge text-bg-danger">Ολοκληρώθηκε</span>
+                        {{/if}}
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

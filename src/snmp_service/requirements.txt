@@ -1,0 +1,6 @@
+pyasn1==0.4.8
+pyasn1_modules==0.4.1
+pyasyncore==1.0.4
+pysnmp==4.4.12
+influxdb-client
+paho-mqtt==1.6.1

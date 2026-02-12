@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: fireadmin_app
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mariadb
+      DB_USER: fireuser
+      DB_PASSWORD: fireuser_passwd
+      DB_NAME: fireadmin
+      DB_PORT: 3306
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: node index.js
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fireadmin
+      MYSQL_USER: fireuser
+      MYSQL_PASSWORD: fireuser_passwd
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    depends_on:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
+
+volumes:
+  mariadb_data:

@@ -1,0 +1,17 @@
+hr {
+    margin: 0;
+}
+
+.topology-menu {
+    margin-bottom: 2rem;
+}
+
+.topology-menu span:hover {
+    cursor: pointer;
+}
+
+.topology-menu span.active {
+    color: #2f75a6;
+    font-weight: bold;
+    border-bottom: 2px solid #2f75a6;
+}

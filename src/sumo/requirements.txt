@@ -1,0 +1,6 @@
+flask
+flask-socketio
+traci
+sumolib
+requests
+pyproj
