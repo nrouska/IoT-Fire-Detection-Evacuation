@@ -15,7 +15,7 @@ Demo Video
 https://www.youtube.com/watch?v=UeLNhL4mcUU
 
 Tools/SW/Protocols
-1. Frameworks: Express, FastAPI, Flask-SocketIORTSP
+1. Frameworks: Express, FastAPI, Flask-SocketIO
 2. AI: YOLOv8, MiDaS, TensorFlow, PyTorch, OpenCV
 3. DataBases: MariaDB, InfluxDB, phpMyAdmin
 4. Streaming: RTSP, HLS, FFmpeg, curl, mediamtx
