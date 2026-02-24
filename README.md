@@ -16,8 +16,9 @@ https://www.youtube.com/watch?v=UeLNhL4mcUU
 
 Deployment
 
-1.Docker is used and the containers are in the same network
-2.Hosted on a VM from Hetzner
-3.Nginx is used as reverse proxy
+1. Docker is used and the containers are in the same network
+2. Hosted on a VM from Hetzner
+3. Nginx is used as reverse proxy
+   
 https://user.fireproject.sveronis.net/
 https://admin.fireproject.sveronis.net/
