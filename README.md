@@ -19,7 +19,7 @@ https://www.youtube.com/watch?v=UeLNhL4mcUU
 2. AI: YOLOv8, MiDaS, TensorFlow, PyTorch, OpenCV
 3. DataBases: MariaDB, InfluxDB, phpMyAdmin
 4. Streaming: RTSP, HLS, FFmpeg, curl, mediamtx
-5. Communication: Fiware, MQTT, SNMP, HTTP
+5. Communication: FIWARE, MQTT, SNMP, HTTP
 6. Simulation/Visualization: SUMO, Grafana, Leaflet
 
 # Deployment
