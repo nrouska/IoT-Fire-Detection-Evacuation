@@ -9,7 +9,7 @@ Designed and developed an end-to-end IoT system. Architecture is shown below:
 3. Data from CrowdFlow radars and Parking Sensors using MQTT
 4. Evacuation Path for User depending in their Location away from fire
 5. Administrator Dashboard for system oversight
-6. Simulation of evacuation flows with SUMO
+6. Simulation of evacuation flows (pedestrians and vehicles) with SUMO
    
 # Demo Video
 https://www.youtube.com/watch?v=UeLNhL4mcUU
