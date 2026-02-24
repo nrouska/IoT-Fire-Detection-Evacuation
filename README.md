@@ -14,12 +14,8 @@ Demo Video
 https://www.youtube.com/watch?v=UeLNhL4mcUU
 
 Deployment
-
 Docker is used and the containers are in the same network
-
 Hosted on a VM from Hetzner
-
 Nginx is used as reverse proxy
-
 https://user.fireproject.sveronis.net/
 https://admin.fireproject.sveronis.net/
