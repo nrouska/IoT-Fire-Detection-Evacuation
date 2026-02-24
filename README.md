@@ -14,8 +14,15 @@ Smart System
 Demo Video
 https://www.youtube.com/watch?v=UeLNhL4mcUU
 
-Deployment
+Tools/SW/Protocols
+1. Frameworks: Express, FastAPI, Flask-SocketIORTSP
+2. AI: YOLOv8, MiDaS, TensorFlow, PyTorch, OpenCV
+3. DataBases: MariaDB, InfluxDB, phpMyAdmin
+4. Streaming: RTSP, HLS, FFmpeg, curl, mediamtx
+5. Communication: Fiware, MQTT
+6. Simulation/Visualization: SUMO, Grafana, Leaflet
 
+Deployment
 1. Docker is used and the containers are in the same network
 2. Hosted on a VM from Hetzner
 3. Nginx is used as reverse proxy
