@@ -7,7 +7,7 @@ Designed and developed an end-to-end IoT system. Architecture is shown below:
 1. Fire Detection and Location Estimation with AI models
 2. Crowd Estimation in Buildngs using SNMP
 3. Data from CrowdFlow radars and Parking Sensors using MQTT
-4. Evacuation Path for User depending in their Location away from fire
+4. Evacuation Path for User depending on their Location away from fire
 5. Administrator Dashboard for system oversight
 6. Simulation of evacuation flows (pedestrians and vehicles) with SUMO
    
