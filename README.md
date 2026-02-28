@@ -27,5 +27,4 @@ https://www.youtube.com/watch?v=UeLNhL4mcUU
 2. Hosted on a VM from Hetzner
 3. Nginx is used as reverse proxy
    
-https://user.fireproject.sveronis.net/
-https://admin.fireproject.sveronis.net/
+
